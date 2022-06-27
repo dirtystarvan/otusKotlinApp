@@ -8,8 +8,11 @@ plugins {
 group = "ru.ac1d"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
 
 dependencies {
