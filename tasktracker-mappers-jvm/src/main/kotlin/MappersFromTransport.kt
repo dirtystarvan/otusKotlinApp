@@ -99,27 +99,6 @@ private fun List<TaskUpdatable>?.fromTransport() : MutableList<TAppTask> {
     return this.map { it.let { it.fromTransport()} }.toMutableList()
 }
 
-//private fun TaskCreateObject?.fromTransport() : TAppTask {
-//    if (this == null)
-//        return TAppTask()
-//
-//    return TAppTask(
-//        title = this.title ?: "",
-//        description = this.description ?: "",
-//        type = this.type.fromTransport(),
-//        reporterId = this.reporterId.toUserId(),
-//        executorId = this.executorId.toUserId(),
-//        status = this.status.fromTransport(),
-//        timings = this.timings.fromTransport(),
-//        subtasks = this.subtasks.fromTransport(),
-//    )
-//}
-
-//private fun TaskCreateObject?.fromTransport() : TAppTask {
-//    if (this == null)
-//        return TAppTask()
-//}
-
 private fun TaskUpdatable?.fromTransport() : TAppTask {
     if (this == null)
         return TAppTask()
@@ -129,29 +108,12 @@ private fun TaskUpdatable?.fromTransport() : TAppTask {
         description = this.description ?: "",
         type = this.type.fromTransport(),
         reporterId = this.reporterId.toUserId(),
-        executorId = this.reporterId.toUserId(),
+        executorId = this.executorId.toUserId(),
         status = this.status.fromTransport(),
         timings = this.timings.fromTransport(),
         subtasks = this.subtasks.fromTransport(),
     )
 }
-
-//private fun TaskUpdateObject?.fromTransport() : TAppTask {
-//    if (this == null)
-//        return TAppTask()
-//
-//    return TAppTask(
-//        id = this.id.toTaskId(),
-//        title = this.title ?: "",
-//        description = this.description ?: "",
-//        type = this.type.fromTransport(),
-//        reporterId = this.reporterId.toUserId(),
-//        executorId = this.executorId.toUserId(),
-//        status = this.status.fromTransport(),
-//        timings = this.timings.fromTransport(),
-//        subtasks = this.subtasks.fromTransport(),
-//    )
-//}
 
 private fun TaskDebug?.workModeFromTransport() =
     when (this?.mode) {

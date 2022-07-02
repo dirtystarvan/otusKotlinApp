@@ -1,0 +1,51 @@
+### Create
+POST http://127.0.0.1:8080/v1/task/create
+Content-Type: application/json
+
+{
+  "requestId": "123",
+  "requestType": "create",
+  "task": {
+    "baseTask": {
+      "title": "Some task",
+      "description": "Test test test",
+      "type": "task",
+      "reporterId": "666",
+      "executorId": "111",
+      "status": "open"
+    }
+  },
+  "debug": {
+    "mode": "test"
+  }
+}
+
+### Get unexisted ID
+POST http://127.0.0.1:8080/v1/task/read
+Content-Type: application/json
+
+{
+  "requestId": "12345",
+  "requestType": "read",
+  "task": {
+    "id": "121212"
+  },
+  "debug": {
+    "stub": "badId"
+  }
+}
+
+### Read With Existed id
+POST http://127.0.0.1:8080/v1/task/read
+Content-Type: application/json
+
+{
+  "requestId": "12345",
+  "requestType": "read",
+  "task": {
+    "id": "existed"
+  },
+  "debug": {
+    "stub": "success"
+  }
+}
