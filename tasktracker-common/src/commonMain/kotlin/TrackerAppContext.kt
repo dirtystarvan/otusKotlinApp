@@ -16,4 +16,10 @@ data class TrackerAppContext (
     var taskFilterRequest: TAppTaskFilter = TAppTaskFilter(),
     var taskResponse: TAppTask = TAppTask(),
     var taskListResponse: MutableList<TAppTask> = mutableListOf(),
+
+    var taskValidating: TAppTask = TAppTask(),
+    var taskFilterValidating: TAppTaskFilter = TAppTaskFilter(),
+
+    var taskValidated: TAppTask = TAppTask(),
+    var taskFilterValidated: TAppTaskFilter = TAppTaskFilter(),
 )

@@ -12,4 +12,18 @@ data class TAppTask(
     var subtasks: MutableList<TAppTask> = mutableListOf(),
     var ownerId: TAppUserId = TAppUserId.NONE,
     var permissionsClient: MutableSet<TAppTaskPermissionsClient> = mutableSetOf()
-)
+) {
+    fun deepCopy() = TAppTask(
+        id = this@TAppTask.id,
+        title = this@TAppTask.title,
+        description = this@TAppTask.description,
+        type = this@TAppTask.type,
+        reporterId = this@TAppTask.reporterId,
+        executorId = this@TAppTask.executorId,
+        status = this@TAppTask.status,
+        timings = this@TAppTask.timings,
+        subtasks = this@TAppTask.subtasks,
+        ownerId = this@TAppTask.ownerId,
+        permissionsClient = this@TAppTask.permissionsClient.toMutableSet()
+    )
+}
