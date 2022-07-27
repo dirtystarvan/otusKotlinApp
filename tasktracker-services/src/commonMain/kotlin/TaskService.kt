@@ -1,3 +1,4 @@
+import ru.ac1d.tasktracker.biz.TAppTaskProcessor
 import ru.ac1d.tasktracker.common.TrackerAppContext
 import ru.ac1d.tasktracker.common.models.TAppError
 import ru.ac1d.tasktracker.common.models.TAppTaskId
@@ -5,6 +6,10 @@ import ru.ac1d.tasktracker.common.models.TAppWorkMode
 import ru.ac1d.tasktracker.common.stubs.TAppStubs
 
 class TaskService {
+    private val processor = TAppTaskProcessor()
+
+    suspend fun exec(context: TrackerAppContext) = processor.exec(context)
+
     fun createTask(appContext: TrackerAppContext) : TrackerAppContext {
         val response = when(appContext.workMode) {
             TAppWorkMode.PROD -> TODO()
