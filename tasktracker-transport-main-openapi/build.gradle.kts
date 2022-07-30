@@ -8,14 +8,17 @@ version = rootProject.version
 
 dependencies {
     val jacksonVersion: String by project
+    val junitJupiterVersion: String by project
+    val kotlinVersion: String by project
+
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
 
-    runtimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
+    runtimeOnly("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
 }
 
 sourceSets {
