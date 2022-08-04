@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm")
     application
 }
 
 group = "ru.ac1d"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 allprojects {
     repositories {
