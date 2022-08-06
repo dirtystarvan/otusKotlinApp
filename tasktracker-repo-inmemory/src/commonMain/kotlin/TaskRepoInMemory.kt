@@ -155,7 +155,7 @@ class TaskRepoInMemory(
             errors = listOf(
                 TAppError(
                     field = "id",
-                    message = "Not Found"
+                    message = "Not found"
                 )
             )
         )

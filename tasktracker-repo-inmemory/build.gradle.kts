@@ -26,7 +26,8 @@ kotlin {
         @Suppress("UNUSED_VARIABLE")
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test-junit"))
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
                 implementation(project(":tasktracker-repo-tests"))
             }
         }
@@ -39,10 +40,7 @@ kotlin {
         @Suppress("UNUSED_VARIABLE")
         val jvmTest by getting {
             dependencies {
-//                implementation(kotlin("test-junit"))
-                // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-                implementation("org.junit.jupiter:junit-jupiter-engine:5.9.0")
-
+                implementation(kotlin("test-junit"))
             }
         }
     }

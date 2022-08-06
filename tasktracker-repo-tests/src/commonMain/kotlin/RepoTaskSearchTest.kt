@@ -1,3 +1,5 @@
+package ru.ac1d.tasktracker.common.repo.test
+
 import kotlinx.coroutines.runBlocking
 import ru.ac1d.tasktracker.common.models.TAppTask
 import ru.ac1d.tasktracker.common.models.TAppTaskType
@@ -9,7 +11,7 @@ import kotlin.test.assertEquals
 
 abstract class RepoTaskSearchTest {
     abstract val repo: ITaskRepo
-    protected open val expectedTaskList: List<TAppTask> = initObjects
+    private val expectedTaskList: List<TAppTask> = initObjects
 
     companion object: BaseInitTaskObjs("search") {
         private val searchOwnerId = TAppUserId("searchUser-123")
@@ -46,9 +48,9 @@ abstract class RepoTaskSearchTest {
 
     @Test
     fun notFoundTest() {
-        val result = runBlocking { repo.searchTask(DbTaskFilterRequest(titleFilter = "")) }
+        val result = runBlocking { repo.searchTask(DbTaskFilterRequest(titleFilter = "badtitle")) }
 
-        assertEquals(false, result.isSuccess)
+        assertEquals(true, result.isSuccess)
         assertEquals(0, result.result?.size)
     }
 }
