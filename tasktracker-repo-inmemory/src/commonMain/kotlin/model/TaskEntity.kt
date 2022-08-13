@@ -12,8 +12,8 @@ data class TaskEntity(
     val status: String? = null,
     val type: String? = null,
     val timings: TaskTimingsEntity? = null,
-    val subtasks: List<TaskEntity> = emptyList()
-    //TODO: lock
+    val subtasks: List<TaskEntity> = emptyList(),
+    val lock: String? = null,
 ) {
     constructor(task: TAppTask): this(
         id = task.id.asString().takeIf { it.isNotBlank() },
@@ -26,6 +26,7 @@ data class TaskEntity(
         type = task.type.takeIf { it != TAppTaskType.NONE }?.name,
         timings = task.timings.toEntity(),
         subtasks = task.subtasks.toEntity(),
+        lock = task.lock.asString().takeIf { it.isNotBlank() },
     )
 
     fun toInternal() = TAppTask(
@@ -38,7 +39,8 @@ data class TaskEntity(
         status = status?.let { TAppTaskStatus.valueOf(it) } ?: TAppTaskStatus.NONE,
         type = type?.let { TAppTaskType.valueOf(it) } ?: TAppTaskType.NONE,
         timings = timings?.toInternal() ?: TAppTaskTimings(),
-        subtasks = subtasks.toInternal()
+        subtasks = subtasks.toInternal(),
+        lock = lock?.let { TAppTaskLock(it) }?: TAppTaskLock.NONE,
     )
 }
 

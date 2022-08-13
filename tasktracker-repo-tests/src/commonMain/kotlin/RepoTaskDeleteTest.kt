@@ -15,13 +15,13 @@ abstract class RepoTaskDeleteTest {
     companion object: BaseInitTaskObjs("delete"), IInitObjects<TAppTask> {
         private val expected = initTestModel()
         override val initObjects = listOf(expected)
-
     }
 
     @Test
     fun deleteSuccessTest() {
-        //TODO lock
         val result = runBlocking { repo.deleteTask(DbTaskIdRequest(expected)) }
+
+        println(result.errors)
 
         assertEquals(true, result.isSuccess)
         assertEquals(expected, result.result)
@@ -36,7 +36,7 @@ abstract class RepoTaskDeleteTest {
         assertEquals(false, result.isSuccess)
         assertEquals(null, result.result)
         assertEquals(
-            listOf(TAppError(field = "id", message = "Not Found")),
+            listOf(TAppError(field = "id", message = "Not found")),
             result.errors
         )
     }

@@ -11,6 +11,7 @@ data class TAppTask(
     val timings: TAppTaskTimings = TAppTaskTimings(),
     var subtasks: MutableList<TAppTask> = mutableListOf(),
     var ownerId: TAppUserId = TAppUserId.NONE,
+    var lock: TAppTaskLock = TAppTaskLock.NONE,
     var permissionsClient: MutableSet<TAppTaskPermissionsClient> = mutableSetOf()
 ) {
     fun deepCopy() = TAppTask(
@@ -24,6 +25,7 @@ data class TAppTask(
         timings = this@TAppTask.timings,
         subtasks = this@TAppTask.subtasks,
         ownerId = this@TAppTask.ownerId,
+        lock = this@TAppTask.lock,
         permissionsClient = this@TAppTask.permissionsClient.toMutableSet()
     )
 }

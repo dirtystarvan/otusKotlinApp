@@ -8,6 +8,7 @@ import ru.ac1d.tasktracker.common.models.TAppTask
 import ru.ac1d.tasktracker.common.repo.DbTaskRequest
 import ru.ac1d.tasktracker.common.repo.ITaskRepo
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 abstract class RepoTaskUpdateTest {
     abstract val repo: ITaskRepo
@@ -31,7 +32,7 @@ abstract class RepoTaskUpdateTest {
         assertEquals(updateObj.executorId, result.result?.executorId)
         assertEquals(updateObj.status, result.result?.status)
         assertEquals(updateObj.type, result.result?.type)
-        //TODO lock
+        assertNotEquals(updateObj.lock, result.result?.lock)
         assertEquals(0, result.errors.size)
     }
 

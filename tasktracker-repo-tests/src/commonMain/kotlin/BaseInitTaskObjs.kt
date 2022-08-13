@@ -21,6 +21,6 @@ abstract class BaseInitTaskObjs(private val operation: String) {
         reporterId = reporter,
         executorId = executor,
         status = status,
-        //TODO lock
+        lock = TAppTaskLock("3b8be96a-05d9-40d3-8808-c7928c0e8d01")
     )
 }

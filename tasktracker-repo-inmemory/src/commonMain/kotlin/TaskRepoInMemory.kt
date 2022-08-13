@@ -5,6 +5,7 @@ import kotlin.time.Duration
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import model.TaskEntity
+import ru.ac1d.tasktracker.common.helpers.errorConcurrency
 import ru.ac1d.tasktracker.common.models.*
 import kotlin.time.Duration.Companion.minutes
 
@@ -40,7 +41,7 @@ class TaskRepoInMemory(
 
     override suspend fun createTask(request: DbTaskRequest): DbTaskResponse {
         val key = randomUUID
-        val taskCopy = request.task.copy(id = TAppTaskId(key)) //TODO: lock
+        val taskCopy = request.task.copy(id = TAppTaskId(key), lock = TAppTaskLock(randomUUID))
         val entity = TaskEntity(taskCopy)
 
         mutex.withLock {
@@ -63,15 +64,17 @@ class TaskRepoInMemory(
 
     override suspend fun updateTask(request: DbTaskRequest): DbTaskResponse {
         val key = request.task.id.takeIf { it != TAppTaskId.NONE }?.asString() ?: return resultErrorEmptyId
-        //TODO lock
-        val newTask = request.task.copy()
+        val newTask = request.task.copy(lock = TAppTaskLock(randomUUID))
+        val oldLock = request.task.lock.takeIf { it != TAppTaskLock.NONE }?.asString()
         val entity = TaskEntity(newTask)
 
         mutex.withLock {
             val local = cache.get(key)
-            when (local) {
-                null -> return resultErrorNotFound
-                else -> cache.put(key, entity)
+
+            when {
+                local == null -> return resultErrorNotFound
+                local.lock == null || local.lock == oldLock -> cache.put(key, entity)
+                else -> resultErrorConcurrent
             }
         }
 
@@ -83,18 +86,22 @@ class TaskRepoInMemory(
 
     override suspend fun deleteTask(request: DbTaskIdRequest): DbTaskResponse {
         val key = request.id.takeIf { it != TAppTaskId.NONE }?.asString() ?: return resultErrorEmptyId
+        val oldLock = request.lock.takeIf { it != TAppTaskLock.NONE }?.asString()
 
         mutex.withLock {
             val local = cache.get(key) ?: return resultErrorNotFound
-            cache.invalidate(key)
 
-            //TODO: lock
+            if (local.lock == null || local.lock == oldLock) {
+                cache.invalidate(key)
 
-            return DbTaskResponse(
-                result = local.toInternal(),
-                isSuccess = true,
-                errors = emptyList()
-            )
+                return DbTaskResponse(
+                    result = local.toInternal(),
+                    isSuccess = true,
+                    errors = emptyList()
+                )
+            } else {
+                return resultErrorConcurrent
+            }
         }
     }
 
@@ -135,19 +142,17 @@ class TaskRepoInMemory(
                 )
             )
         )
-        //TODO lock
-//        val resultErrorConcurrent = DbTaskResponse(
-//            result = null,
-//            isSuccess = false,
-//            errors = listOf(
-//                errorConcurrency(
-//                    violationCode = "changed",
-//                    description = "Object has changed during request handling"
-//                ),
-//            )
-//        )
 
-
+        val resultErrorConcurrent = DbTaskResponse(
+            result = null,
+            isSuccess = false,
+            errors = listOf(
+                errorConcurrency(
+                    violationCode = "changed",
+                    description = "Object has changed during request handling"
+                ),
+            )
+        )
 
         val resultErrorNotFound = DbTaskResponse(
             isSuccess = false,

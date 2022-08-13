@@ -55,6 +55,7 @@ private fun TAppTask.toTransport() = TaskResponseObject(
     baseTask = baseTaskObject(),
     ownerId = ownerId.takeIf { it != TAppUserId.NONE }?.asString(),
     permissions = permissionsClient.toTransportTaskPerm(),
+    lock = lock.asString()
 )
 
 private fun TAppTask.baseTaskObject() = TaskUpdatable(

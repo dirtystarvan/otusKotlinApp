@@ -57,9 +57,11 @@ fun TrackerAppContext.fromTransport(request: TaskSearchRequest) {
 private fun String?.toUserId() = this?.let { TAppUserId(it) } ?: TAppUserId.NONE
 private fun String?.toTaskId() = this?.let { TAppTaskId(it) } ?: TAppTaskId.NONE
 
+private fun String?.toTaskLock() = this?.let { TAppTaskLock(it) } ?: TAppTaskLock.NONE
+
 private fun IRequest?.idFromTransport() = this?.requestId?.let { TAppRequestId(it) } ?: TAppRequestId.NONE
 
-private fun TaskWithIdRequestTask?.fromTransport() = this?.let {TAppTask(id = it.id.toTaskId())} ?: TAppTask()
+private fun TaskWithIdRequestTask?.fromTransport() = this?.let { TAppTask(id = it.id.toTaskId(), lock = it.lock.toTaskLock()) } ?: TAppTask()
 
 private fun TaskSearchFilter?.fromTransport() = this?.let { TAppTaskFilter(searchString = it.searchString ?: "") } ?: TAppTaskFilter()
 
@@ -93,7 +95,7 @@ private fun TaskTimings?.fromTransport() : TAppTaskTimings {
 }
 
 private fun List<TaskUpdatable>?.fromTransport() : MutableList<TAppTask> {
-    if (this == null || this.isEmpty())
+    if (this.isNullOrEmpty())
         return mutableListOf()
 
     return this.map { it.let { it.fromTransport()} }.toMutableList()
@@ -110,6 +112,7 @@ private fun TaskUpdatable?.fromTransport() : TAppTask {
         reporterId = this.reporterId.toUserId(),
         executorId = this.executorId.toUserId(),
         status = this.status.fromTransport(),
+        lock = this.lock.toTaskLock(),
         timings = this.timings.fromTransport(),
         subtasks = this.subtasks.fromTransport(),
     )
