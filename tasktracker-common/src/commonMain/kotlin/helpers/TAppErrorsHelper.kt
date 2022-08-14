@@ -6,10 +6,6 @@ import ru.ac1d.tasktracker.common.models.TAppErrorLevels
 import ru.ac1d.tasktracker.common.models.TAppStates
 
 fun errorConcurrency(
-    /**
-     * Код, характеризующий ошибку. Не должен включать имя поля или указание на валидацию.
-     * Например: empty, badSymbols, tooLong, etc
-     */
     violationCode: String,
     description: String,
     level: TAppErrorLevels = TAppErrorLevels.ERROR,
@@ -18,6 +14,20 @@ fun errorConcurrency(
     code = "concurrent-$violationCode",
     group = "concurrency",
     message = "Concurrent object access error: $description",
+    level = level,
+)
+
+fun errorAdministration(
+    field: String = "",
+    violationCode: String,
+    description: String,
+    exception: Exception? = null,
+    level: TAppErrorLevels = TAppErrorLevels.ERROR,
+) = TAppError(
+    field = field,
+    code = "administration-$violationCode",
+    group = "administration",
+    message = "Microservice management error: $description",
     level = level,
 )
 

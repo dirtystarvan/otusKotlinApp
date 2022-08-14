@@ -12,10 +12,8 @@ import kotlin.time.Duration.Companion.minutes
 class TaskRepoInMemory(
     private val initObjects: List<TAppTask> = emptyList(),
     ttl: Duration = 2.minutes,
+    val randomUUID: () -> String = { uuid4().toString() }
 ) : ITaskRepo {
-    private val randomUUID: String
-        get() = uuid4().toString()
-
     private val mutex = Mutex()
 
     private val cache = Cache.Builder()
@@ -40,8 +38,8 @@ class TaskRepoInMemory(
     }
 
     override suspend fun createTask(request: DbTaskRequest): DbTaskResponse {
-        val key = randomUUID
-        val taskCopy = request.task.copy(id = TAppTaskId(key), lock = TAppTaskLock(randomUUID))
+        val key = randomUUID()
+        val taskCopy = request.task.copy(id = TAppTaskId(key), lock = TAppTaskLock(randomUUID()))
         val entity = TaskEntity(taskCopy)
 
         mutex.withLock {
@@ -64,7 +62,7 @@ class TaskRepoInMemory(
 
     override suspend fun updateTask(request: DbTaskRequest): DbTaskResponse {
         val key = request.task.id.takeIf { it != TAppTaskId.NONE }?.asString() ?: return resultErrorEmptyId
-        val newTask = request.task.copy(lock = TAppTaskLock(randomUUID))
+        val newTask = request.task.copy(lock = TAppTaskLock(randomUUID()))
         val oldLock = request.task.lock.takeIf { it != TAppTaskLock.NONE }?.asString()
         val entity = TaskEntity(newTask)
 
@@ -108,7 +106,12 @@ class TaskRepoInMemory(
     override suspend fun searchTask(request: DbTaskFilterRequest): DbTaskListResponse {
         val result = cache.asMap().asSequence()
             .filter { entry ->
-                request.ownerId.takeIf { it != TAppUserId.NONE }?.let {
+                request.reporterId.takeIf { it != TAppUserId.NONE }?.let {
+                    it.asString() == entry.value.ownerId
+                } ?: true
+            }
+            .filter { entry ->
+                request.executorId.takeIf { it != TAppUserId.NONE }?.let {
                     it.asString() == entry.value.ownerId
                 } ?: true
             }
