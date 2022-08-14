@@ -1,10 +1,11 @@
 
 plugins {
-    kotlin("jvm") apply false
+    kotlin("jvm")
+    application
 }
 
 group = "ru.ac1d"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 allprojects {
     repositories {
