@@ -4,7 +4,6 @@ pluginManagement {
     plugins {
         val kotlinVersion: String by settings
         val openapiVersion: String by settings
-        val kotlinVersion: String by settings
 
         kotlin("jvm") version kotlinVersion apply false
         kotlin("multiplatfrom") version kotlinVersion apply false

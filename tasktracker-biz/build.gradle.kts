@@ -4,7 +4,7 @@ plugins {
 
 kotlin {
     jvm {}
-    linuxX64 {}
+//    linuxX64 {}
 
     sourceSets {
         val coroutinesVersion: String by project
@@ -28,7 +28,7 @@ kotlin {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
 
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
             }
         }
         @Suppress("UNUSED_VARIABLE")
