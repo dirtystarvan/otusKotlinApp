@@ -5,7 +5,7 @@ import com.crowdproj.kotlin.cor.handlers.worker
 import ru.ac1d.tasktracker.common.TrackerAppContext
 import ru.ac1d.tasktracker.common.models.TAppStates
 
-fun ICorChainDsl<TrackerAppContext>.finishAdValidation(title: String) = worker {
+fun ICorChainDsl<TrackerAppContext>.finishTaskValidation(title: String) = worker {
     this.title = title
     on { status == TAppStates.RUNNING }
     handle {
@@ -13,7 +13,7 @@ fun ICorChainDsl<TrackerAppContext>.finishAdValidation(title: String) = worker {
     }
 }
 
-fun ICorChainDsl<TrackerAppContext>.finishAdFilterValidation(title: String) = worker {
+fun ICorChainDsl<TrackerAppContext>.finishTaskFilterValidation(title: String) = worker {
     this.title = title
     on { status == TAppStates.RUNNING }
     handle {
