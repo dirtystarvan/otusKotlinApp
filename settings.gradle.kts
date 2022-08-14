@@ -14,3 +14,6 @@ pluginManagement {
 include("tasktracker-transport-main-openapi")
 include("tasktracker-common")
 include("tasktracker-mappers-jvm")
+include("tasktracker-app-ktor")
+include("tasktracker-services")
+include("tasktracker-stubs")

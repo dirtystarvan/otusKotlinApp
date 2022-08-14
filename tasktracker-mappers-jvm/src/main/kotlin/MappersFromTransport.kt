@@ -108,7 +108,7 @@ private fun TaskUpdatable?.fromTransport() : TAppTask {
         description = this.description ?: "",
         type = this.type.fromTransport(),
         reporterId = this.reporterId.toUserId(),
-        executorId = this.reporterId.toUserId(),
+        executorId = this.executorId.toUserId(),
         status = this.status.fromTransport(),
         timings = this.timings.fromTransport(),
         subtasks = this.subtasks.fromTransport(),
