@@ -68,7 +68,7 @@ class RabbitTestContainer {
     }
 
     @Test
-    fun adCreateTest() {
+    fun taskCreateTest() {
         val keyOut = processor.processorConfig.keyOut
         val keyIn = processor.processorConfig.keyIn
         ConnectionFactory().apply {
