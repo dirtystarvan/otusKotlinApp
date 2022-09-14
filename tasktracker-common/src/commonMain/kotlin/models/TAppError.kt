@@ -6,4 +6,5 @@ data class TAppError (
     val field: String = "",
     val message: String = "",
     val exception: Throwable? = null,
+    val level: TAppErrorLevels = TAppErrorLevels.ERROR,
 )

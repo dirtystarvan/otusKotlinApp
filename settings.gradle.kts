@@ -2,8 +2,8 @@ rootProject.name = "kotlinBackend"
 
 pluginManagement {
     plugins {
-        val openapiVersion: String by settings
         val kotlinVersion: String by settings
+        val openapiVersion: String by settings
 
         kotlin("jvm") version kotlinVersion apply false
         kotlin("multiplatfrom") version kotlinVersion apply false
@@ -17,3 +17,4 @@ include("tasktracker-mappers-jvm")
 include("tasktracker-app-ktor")
 include("tasktracker-services")
 include("tasktracker-stubs")
+include("tasktracker-biz")

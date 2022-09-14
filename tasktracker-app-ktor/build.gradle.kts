@@ -40,10 +40,6 @@ dependencies {
     implementation(ktor("cors")) // "io.ktor:ktor-cors:$ktorVersion"
     implementation(ktor("auto-head-response"))
 
-    // implementation(ktor("websockets")) // "io.ktor:ktor-websockets:$ktorVersion"
-    // implementation(ktor("auth")) // "io.ktor:ktor-auth:$ktorVersion"
-    // implementation(ktor("auth-jwt")) // "io.ktor:ktor-auth-jwt:$ktorVersion"
-
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     // transport models

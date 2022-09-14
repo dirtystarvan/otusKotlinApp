@@ -4,4 +4,5 @@ enum class TAppStates {
     NONE,
     RUNNING,
     FAILING,
+    FINISHING,
 }
