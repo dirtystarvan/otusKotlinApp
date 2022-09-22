@@ -12,13 +12,12 @@ object Tasks: StringIdTable("tasks") {
 
     val title = varchar("title", 256)
     val description = varchar("description", 512)
-    val ownerId = reference("ownerId", Users)
-    val reporterId = reference("reporter_id", Users)
-    val executorId = reference("executor_id", Users)
+    val ownerId = reference("owner_id", Owners)
+    val reporterId = reference("reporter_id", Reporters)
+    val executorId = reference("executor_id", Executors)
     val status = enumerationByName("status", 15, TAppTaskStatus::class)
     val type = enumerationByName("type", 15, TAppTaskType::class)
     val timings = reference("timings", Timings)
-//    val parent = reference("parent_task", Tasks)
     val lock = varchar("lock", 100)
 
     fun from(result: ResultRow) = TAppTask(
@@ -30,8 +29,8 @@ object Tasks: StringIdTable("tasks") {
         executorId = TAppUserId(result[executorId].toString()),
         status = result[status],
         type = result[type],
-        timings = TAppTaskTimings(TAppTaskDateImpl(result[start].toString()),
-                                    TAppTaskDateImpl(result[end].toString()),
+        timings = TAppTaskTimings(TAppTaskDate(result[start].toString()),
+                                    TAppTaskDate(result[end].toString()),
                                     result[estimation]),
         lock = TAppTaskLock(result[lock])
     )

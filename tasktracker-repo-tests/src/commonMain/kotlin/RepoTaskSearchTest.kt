@@ -18,7 +18,7 @@ abstract class RepoTaskSearchTest {
         val initObjects: List<TAppTask> = listOf(
             initTestModel("task1"),
             initTestModel("task2", owner = searchOwnerId),
-            initTestModel("task1", taskType = TAppTaskType.STORY),
+            initTestModel("task3", taskType = TAppTaskType.STORY),
         )
     }
 

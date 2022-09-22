@@ -1,8 +1,6 @@
 package model
 
-import ru.ac1d.tasktracker.common.models.TAppTask
 import ru.ac1d.tasktracker.common.models.TAppTaskDate
-import ru.ac1d.tasktracker.common.models.TAppTaskDateImpl
 import ru.ac1d.tasktracker.common.models.TAppTaskTimings
 
 data class TaskTimingsEntity(
@@ -17,8 +15,8 @@ data class TaskTimingsEntity(
     )
 
     fun toInternal() = TAppTaskTimings(
-        start = start?.let { TAppTaskDateImpl(it) }?: TAppTaskDate.NONE,
-        end = end?.let { TAppTaskDateImpl(it) }?: TAppTaskDate.NONE,
+        start = start?.let { TAppTaskDate(it) }?: TAppTaskDate.NONE,
+        end = end?.let { TAppTaskDate(it) }?: TAppTaskDate.NONE,
         estimation = estimation
     )
 }

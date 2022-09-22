@@ -3,21 +3,25 @@ package ru.ac1d.tasktracker.common.repo
 import com.benasher44.uuid.uuid4
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.ac1d.tasktracker.common.helpers.errorConcurrency
 import ru.ac1d.tasktracker.common.models.*
-import ru.ac1d.tasktracker.common.repo.tables.Tasks
-import ru.ac1d.tasktracker.common.repo.tables.Tasks.timings
-import ru.ac1d.tasktracker.common.repo.tables.Timings
-import ru.ac1d.tasktracker.common.repo.tables.Users
+import ru.ac1d.tasktracker.common.repo.tables.*
 import java.sql.SQLException
 import java.util.*
 
 class TaskRepoPostgres(
+    url: String = "jdbc:postgresql://localhost:5432/tasker_db",
+    user: String = "postgres",
+    password: String = "strongpassword",
+    schema: String = "tasker_db",
     initObjects: Collection<TAppTask> = emptyList()
 ): ITaskRepo {
-    private val db by lazy { DbConnector().connect(Tasks, Users, Timings) }
+    private val db by lazy { DbConnector(url, user, password, schema)
+        .connect(Tasks, Owners, Executors, Reporters, Timings) }
     private val mutex = Mutex()
 
     init {
@@ -35,12 +39,13 @@ class TaskRepoPostgres(
 
     override suspend fun readTask(request: DbTaskIdRequest): DbTaskResponse {
         return safeTransaction({
-            val result = (Tasks innerJoin Users innerJoin Timings).select { Tasks.id.eq(request.id.asString()) }.single()
+            val result = (Tasks innerJoin Owners innerJoin Reporters innerJoin Executors innerJoin Timings)
+                .select { Tasks.id.eq(request.id.asString()) }.single()
 
             DbTaskResponse(Tasks.from(result), true)
         }, {
             val err = when (this) {
-                is NoSuchElementException -> TAppError(field = "id", message = "Not Found")
+                is NoSuchElementException -> TAppError(field = "id", message = "Not found")
                 is IllegalArgumentException -> TAppError(message = "More than one element with the same id")
                 else -> TAppError(message = localizedMessage)
             }
@@ -55,20 +60,18 @@ class TaskRepoPostgres(
 
         return mutex.withLock {
             safeTransaction({
-                val local = Tasks.select { Tasks.id.eq(key) }.singleOrNull()?.let {
-                    Tasks.from(it)
-                } ?: return@safeTransaction resultErrorNotFound
+                val local = (Tasks innerJoin Owners innerJoin Reporters innerJoin Executors innerJoin Timings)
+                    .select { Tasks.id.eq(key) }.singleOrNull()
+                    ?.let { Tasks.from(it) }
+                    ?: return@safeTransaction resultErrorNotFound
 
                 return@safeTransaction when (oldLock) {
                     null, local.lock.asString() -> updateDb(newTask)
                     else -> resultErrorConcurrent
                 }
             }, {
-                DbTaskResponse(
-                    result = null,
-                    isSuccess = false,
-                    errors = listOf(TAppError(field = "id", message = "Not Found"))
-                )
+                val errors = listOf(TAppError(field = "id", message = "Not found"), TAppError(message = this.localizedMessage))
+                DbTaskResponse(result = null, isSuccess = false, errors = errors)
             })
         }
     }
@@ -78,7 +81,8 @@ class TaskRepoPostgres(
 
         return mutex.withLock {
             safeTransaction({
-                val local = Tasks.select { Tasks.id.eq(key) }.single().let { Tasks.from(it) }
+                val local = (Tasks innerJoin Owners innerJoin Reporters innerJoin Executors innerJoin Timings)
+                    .select { Tasks.id.eq(key) }.single().let { Tasks.from(it) }
 
                 if (local.lock == request.lock) {
                     Tasks.deleteWhere { Tasks.id eq request.id.asString() }
@@ -87,18 +91,16 @@ class TaskRepoPostgres(
                     resultErrorConcurrent
                 }
             }, {
-                DbTaskResponse(
-                    result = null,
-                    isSuccess = false,
-                    errors = listOf(TAppError(field = "id", message = "Not Found"))
-                )
+                resultErrorNotFound
             })
         }
     }
 
     override suspend fun searchTask(request: DbTaskFilterRequest): DbTaskListResponse {
         return safeTransaction({
-            val results = (Tasks innerJoin Users innerJoin Timings).select {
+            val results = (Tasks innerJoin Owners innerJoin Reporters innerJoin Executors innerJoin Timings)
+                .select {
+                (if (request.ownerId == TAppUserId.NONE) Op.TRUE else Tasks.ownerId eq request.ownerId.asString()) and
                 (if (request.reporterId == TAppUserId.NONE) Op.TRUE else Tasks.reporterId eq request.reporterId.asString()) and
                 (if (request.executorId == TAppUserId.NONE) Op.TRUE else Tasks.executorId eq request.executorId.asString()) and
                 (if (request.titleFilter.isBlank()) Op.TRUE else (Tasks.title like "%${request.titleFilter}%") or
@@ -113,65 +115,6 @@ class TaskRepoPostgres(
         })
     }
 
-    private fun save(task: TAppTask): DbTaskResponse {
-        return safeTransaction({
-            val ownerIdKey = Users.insertIgnore {
-                if (task.ownerId != TAppUserId.NONE) {
-                    it[id] = task.ownerId.asString()
-                }
-            } get Users.id
-
-            val executorIdKey = Users.insertIgnore {
-                if (task.executorId != TAppUserId.NONE) {
-                    it[id] = task.executorId.asString()
-                }
-            } get Users.id
-
-            val reporterIdKey = Users.insertIgnore {
-                if (task.reporterId != TAppUserId.NONE) {
-                    it[id] = task.reporterId.asString()
-                }
-            } get Users.id
-
-            val timingsKey = Timings.insertIgnore {
-                if (task.timings.start != TAppTaskDate.NONE) {
-                    it[start] = task.timings.start.asLocalDate()
-                }
-            } get Timings.id
-
-            val res = Tasks.insert {
-                if (task.id != TAppTaskId.NONE) {
-                    it[id] = task.id.asString()
-                }
-                it[title] = task.title
-                it[description] = task.description
-                it[ownerId] = ownerIdKey
-                it[executorId] = executorIdKey
-                it[reporterId] = reporterIdKey
-                it[type] = task.type
-                it[timings] =
-//                it[lock] = task.lock.asString()
-            }
-//            val title = Tasks.varchar("title", 256)
-//            val description = Tasks.varchar("description", 512)
-//            val ownerId = Tasks.reference("ownerId", Users)
-//            val reporterId = Tasks.reference("reporter_id", Users)
-//            val executorId = Tasks.reference("executor_id", Users)
-//            val status = Tasks.enumerationByName("status", 15, TAppTaskStatus::class)
-//            val type = Tasks.enumerationByName("type", 15, TAppTaskType::class)
-//            val timings = Tasks.reference("timings", Timings)
-//            val parent = Tasks.reference("parent_task", Tasks)
-//            val lock = Tasks.varchar("lock", 100)
-            DbTaskResponse(Tasks.from(res), true)//TODO: from mappers
-        }, {
-            DbTaskResponse(
-                result = null,
-                isSuccess = false,
-                errors = listOf(TAppError(message = message ?: localizedMessage))
-            )
-        })
-    }
-
     private fun <T> safeTransaction(statement: Transaction.() -> T, handleException: Throwable.() -> T): T {
         return try {
             transaction(db, statement)
@@ -182,25 +125,90 @@ class TaskRepoPostgres(
         }
     }
 
-    private fun updateDb(task: TAppTask): DbTaskResponse {
-        Users.insertIgnore {
+    private fun updateForeignOwner(task: TAppTask): EntityID<String> {
+        val ownerIdKey = Owners.insertIgnore {
             if (task.ownerId != TAppUserId.NONE) {
                 it[id] = task.ownerId.asString()
             }
+        } get Owners.id
+
+        return ownerIdKey
+    }
+
+    private fun updateForeignExecutor(task: TAppTask): EntityID<String> {
+        val executorIdKey = Executors.insertIgnore {
+            if (task.executorId != TAppUserId.NONE) {
+                it[id] = task.executorId.asString()
+            }
+        } get Executors.id
+
+        return executorIdKey
+    }
+
+    private fun updateForeignReporter(task: TAppTask): EntityID<String> {
+        val reporterIdKey = Reporters.insertIgnore {
+            if (task.reporterId != TAppUserId.NONE) {
+                it[id] = task.reporterId.asString()
+            }
+        } get Reporters.id
+
+        return reporterIdKey
+    }
+
+    private fun updateForeignTimings(task: TAppTask): EntityID<Int> {
+        val timingsIdKey = Timings.insertIgnore {
+            it[start] = task.timings.start.asString()
+            it[end] = task.timings.end.asString()
+            it[estimation] = task.timings.estimation
+        } get Timings.id
+
+        return timingsIdKey
+    }
+
+    private fun fillTasksUpdateBuilder(statement: UpdateBuilder<*>, task: TAppTask) {
+        statement[Tasks.title] = task.title
+        statement[Tasks.description] = task.description
+        statement[Tasks.ownerId] = updateForeignOwner(task)
+        statement[Tasks.executorId] = updateForeignExecutor(task)
+        statement[Tasks.reporterId] = updateForeignReporter(task)
+        statement[Tasks.status] = task.status
+        statement[Tasks.type] = task.type
+        statement[Tasks.timings] = updateForeignTimings(task)
+        statement[Tasks.lock] = task.lock.asString()
+    }
+
+    private fun save(task: TAppTask): DbTaskResponse {
+        return safeTransaction({
+            Tasks.insert {
+                if (task.id != TAppTaskId.NONE) {
+                    it[id] = task.id.asString()
+                }
+                fillTasksUpdateBuilder(it, task)
+            }
+
+            val result = (Tasks innerJoin Owners innerJoin Reporters innerJoin Executors innerJoin Timings)
+                .select { Tasks.id.eq(task.id.asString()) }.single()
+
+            DbTaskResponse(Tasks.from(result), true)
+        }, {
+            DbTaskResponse(
+                result = null,
+                isSuccess = false,
+                errors = listOf(TAppError(message = message ?: localizedMessage))
+            )
+        })
+    }
+
+    private fun updateDb(task: TAppTask): DbTaskResponse {
+        Tasks.update({ Tasks.id.eq(task.id.asString()) }) {
+            fillTasksUpdateBuilder(it, task)
         }
 
-        Tasks.update({ Tasks.id.eq(task.id.asString()) }) {
-            it[title] = task.title
-            it[description] = task.description
-            it[ownerId] = task.ownerId.asString()
-            it[type] = task.type
-            //TODO: another fields
-        }
-        val result = Tasks.select { Tasks.id.eq(task.id.asString()) }.single()
+        val result = (Tasks innerJoin Owners innerJoin Reporters innerJoin Executors innerJoin Timings)
+            .select { Tasks.id.eq(task.id.asString()) }.single()
 
         return DbTaskResponse(result = Tasks.from(result), isSuccess = true)
     }
-
 
     companion object {
         val resultErrorEmptyId = DbTaskResponse(
@@ -229,7 +237,7 @@ class TaskRepoPostgres(
             errors = listOf(
                 TAppError(
                     field = "id",
-                    message = "Not Found"
+                    message = "Not found"
                 )
             )
         )

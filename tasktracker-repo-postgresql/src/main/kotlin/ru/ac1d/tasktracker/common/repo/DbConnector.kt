@@ -7,11 +7,12 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.transactions.DEFAULT_ISOLATION_LEVEL
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class DbConnector {
-    private val url: String = "jdbc:postgresql://localhost:5432/tasker_db"
-    private val user: String = "postgres"
-    private val password: String = "strongpassword"
-    private val schema: String = "tasker_db"
+class DbConnector(
+    private val url: String,
+    private val user: String,
+    private val password: String,
+    private val schema: String
+) {
     private val databaseConfig: DatabaseConfig = DatabaseConfig { defaultIsolationLevel = DEFAULT_ISOLATION_LEVEL }
 
     companion object {
