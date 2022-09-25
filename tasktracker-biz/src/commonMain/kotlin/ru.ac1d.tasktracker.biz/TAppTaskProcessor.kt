@@ -145,7 +145,7 @@ class TAppTaskProcessor(private val settings: TAppSettings = TAppSettings()) {
                 }
 
                 validation("Валидация запроса") {
-                    worker("Копируем поля в adFilterValidating") { taskFilterValidating = taskFilterRequest.copy() }
+                    worker("Копируем поля в taskFilterValidating") { taskFilterValidating = taskFilterRequest.copy() }
 
                     finishTaskFilterValidation("Успешное завершение процедуры валидации")
                 }
