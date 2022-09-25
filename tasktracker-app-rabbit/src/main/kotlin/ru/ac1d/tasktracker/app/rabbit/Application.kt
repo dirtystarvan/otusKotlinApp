@@ -31,5 +31,6 @@ fun main() {
             processors = setOf(processor)
         )
     }
+
     controller.start()
 }
