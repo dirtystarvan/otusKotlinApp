@@ -38,7 +38,7 @@ class TAppTaskProcessor {
                     validateDescriptionNotEmpty("Проверка на непустое описание")
                     validateDescriptionHasContent("Проверка на наличие содержания в описании")
 
-                    finishAdValidation("Успешное завершение процедуры валидации")
+                    finishTaskValidation("Успешное завершение процедуры валидации")
                 }
             }
 
@@ -51,12 +51,12 @@ class TAppTaskProcessor {
                 }
 
                 validation("Валидация запроса") {
-                    worker("Копируем поля в adValidating") { taskValidating = taskRequest.deepCopy() }
+                    worker("Копируем поля в taskValidating") { taskValidating = taskRequest.deepCopy() }
                     worker("Очистка id") { taskValidating.id = TAppTaskId(taskValidating.id.asString().trim()) }
                     validateIdNotEmpty("Проверка на непустой id")
                     validateIdProperFormat("Проверка формата id")
 
-                    finishAdValidation("Успешное завершение процедуры валидации")
+                    finishTaskValidation("Успешное завершение процедуры валидации")
                 }
             }
 
@@ -71,7 +71,7 @@ class TAppTaskProcessor {
                 }
 
                 validation("Валидация запроса") {
-                    worker("Копируем поля в adValidating") { taskValidating = taskRequest.deepCopy() }
+                    worker("Копируем поля в taskValidating") { taskValidating = taskRequest.deepCopy() }
                     worker("Очистка id") { taskValidating.id = TAppTaskId(taskValidating.id.asString().trim()) }
                     worker("Очистка заголовка") { taskValidating.title = taskValidating.title.trim() }
                     worker("Очистка описания") { taskValidating.description = taskValidating.description.trim() }
@@ -82,7 +82,7 @@ class TAppTaskProcessor {
                     validateDescriptionNotEmpty("Проверка на непустое описание")
                     validateDescriptionHasContent("Проверка на наличие содержания в описании")
 
-                    finishAdValidation("Успешное завершение процедуры валидации")
+                    finishTaskValidation("Успешное завершение процедуры валидации")
                 }
             }
 
@@ -95,12 +95,12 @@ class TAppTaskProcessor {
                 }
 
                 validation("Валидация запроса") {
-                    worker("Копируем поля в adValidating") { taskValidating = taskRequest.deepCopy() }
+                    worker("Копируем поля в taskValidating") { taskValidating = taskRequest.deepCopy() }
                     worker("Очистка id") { taskValidating.id = TAppTaskId(taskValidating.id.asString().trim()) }
                     validateIdNotEmpty("Проверка на непустой id")
                     validateIdProperFormat("Проверка формата id")
 
-                    finishAdValidation("Успешное завершение процедуры валидации")
+                    finishTaskValidation("Успешное завершение процедуры валидации")
                 }
             }
 
@@ -113,9 +113,9 @@ class TAppTaskProcessor {
                 }
 
                 validation("Валидация запроса") {
-                    worker("Копируем поля в adFilterValidating") { taskFilterValidating = taskFilterRequest.copy() }
+                    worker("Копируем поля в taskFilterValidating") { taskFilterValidating = taskFilterRequest.copy() }
 
-                    finishAdFilterValidation("Успешное завершение процедуры валидации")
+                    finishTaskFilterValidation("Успешное завершение процедуры валидации")
                 }
             }
         }.build()
