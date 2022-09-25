@@ -25,6 +25,12 @@ fun ICorChainDsl<TrackerAppContext>.validation(title: String, block: ICorChainDs
     this.title = title
 }
 
+fun ICorChainDsl<TrackerAppContext>.repo(title: String, block: ICorChainDsl<TrackerAppContext>.() -> Unit) = chain {
+    block()
+    this.title = title
+}
+
+
 fun ICorChainDsl<TrackerAppContext>.stubs(title: String, block: ICorChainDsl<TrackerAppContext>.() -> Unit) = chain {
     block()
     this.title = title

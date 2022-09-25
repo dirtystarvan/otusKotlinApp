@@ -2,17 +2,15 @@ package ru.ac1d.tasktracker.common.models
 
 import kotlinx.datetime.LocalDateTime
 import ru.ac1d.tasktracker.common.NONE
+import kotlin.jvm.JvmInline
 
-interface TAppTaskDate {
-    fun asString() : String
-    fun asLocalDate() : LocalDateTime
+@JvmInline
+value class TAppTaskDate(private val date: String) {
+    fun asString() = date
+
+    fun asLocalDateTime() = LocalDateTime.parse(date)
 
     companion object {
-        val NONE = object: TAppTaskDate {
-            val date: String = ""
-
-            override fun asString() = date
-            override fun asLocalDate() = LocalDateTime.NONE
-        }
+        val NONE = TAppTaskDate(LocalDateTime.NONE.toString())
     }
 }

@@ -11,8 +11,8 @@ object TaskCreateExample {
             executorId = TAppUserId("666"),
             status = TAppTaskStatus.OPEN,
             timings = TAppTaskTimings(
-                start = TAppTaskDateImpl("2022-06-20"),
-                end = TAppTaskDateImpl("2022-07-04"),
+                start = TAppTaskDate("2022-06-20"),
+                end = TAppTaskDate("2022-07-04"),
                 estimation = 0.5f
             ),
             ownerId = TAppUserId("111"),

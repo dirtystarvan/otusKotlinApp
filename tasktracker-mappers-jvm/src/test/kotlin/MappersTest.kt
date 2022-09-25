@@ -35,7 +35,7 @@ class MappersTest {
         assertEquals(TAppStubs.SUCCESS, context.stubCase)
         assertEquals(TAppWorkMode.STUB, context.workMode)
         assertEquals("test", context.taskRequest.description)
-        assertEquals(LocalDateTime.NONE, context.taskRequest.timings.start.asLocalDate())
+        assertEquals(LocalDateTime.NONE, context.taskRequest.timings.start.asLocalDateTime())
         assertEquals(TAppTaskStatus.OPEN, context.taskRequest.status)
     }
 

@@ -8,14 +8,16 @@ kotlin {
 //    linuxX64 {}
 
     sourceSets {
+        all { languageSettings.optIn("kotlin.RequiresOptIn") }
+
         @Suppress("UNUSED_VARIABLE")
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
 
-                // transport models
                 implementation(project(":tasktracker-common"))
                 implementation(project(":tasktracker-stubs"))
+                implementation(project(":tasktracker-biz"))
             }
         }
 

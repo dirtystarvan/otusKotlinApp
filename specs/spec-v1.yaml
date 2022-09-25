@@ -203,9 +203,15 @@ components:
           type: number
           format: float
 
+    TaskLock:
+      type: string
+      description: Optimistic locking
+
     TaskUpdatable:
       type: object
       properties:
+        lock:
+          $ref: '#/components/schemas/TaskLock'
         title:
           type: string
           description: What to do
@@ -235,6 +241,8 @@ components:
           properties:
             id:
               type: string
+            lock:
+              $ref: '#/components/schemas/TaskLock'
 
     TaskCreateRequest:
       allOf:
@@ -329,6 +337,8 @@ components:
               $ref: '#/components/schemas/TaskUpdatable'
             id:
               type: string
+            lock:
+              $ref: '#/components/schemas/TaskLock'
             ownerId:
               type: string
             permissions:

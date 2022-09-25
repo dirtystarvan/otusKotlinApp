@@ -8,6 +8,8 @@ kotlin {
 //    linuxX64 {}
 
     sourceSets {
+        all { languageSettings.optIn("kotlin.RequiresOptIn") }
+
         @Suppress("UNUSED_VARIABLE")
         val commonMain by getting {
             dependencies {

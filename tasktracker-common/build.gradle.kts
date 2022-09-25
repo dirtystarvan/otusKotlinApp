@@ -2,12 +2,9 @@ plugins {
     kotlin("multiplatform")
 }
 
-group = rootProject.group
-version = rootProject.version
-
 kotlin {
     jvm {}
-    linuxX64 {}
+//    linuxX64 {}
 
     sourceSets {
         val datetimeVersion: String by project

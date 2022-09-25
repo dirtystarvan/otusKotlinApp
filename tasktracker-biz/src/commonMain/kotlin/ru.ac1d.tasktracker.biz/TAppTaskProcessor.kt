@@ -2,22 +2,22 @@ package ru.ac1d.tasktracker.biz
 
 import com.crowdproj.kotlin.cor.handlers.worker
 import com.crowdproj.kotlin.cor.rootChain
-import ru.ac1d.tasktracker.biz.general.initStatus
-import ru.ac1d.tasktracker.biz.general.operation
-import ru.ac1d.tasktracker.biz.general.stubs
-import ru.ac1d.tasktracker.biz.general.validation
+import ru.ac1d.tasktracker.biz.general.*
+import ru.ac1d.tasktracker.biz.repo.*
 import ru.ac1d.tasktracker.biz.stubs.*
 import ru.ac1d.tasktracker.biz.validation.*
 import ru.ac1d.tasktracker.common.TrackerAppContext
 import ru.ac1d.tasktracker.common.models.TAppCommand
+import ru.ac1d.tasktracker.common.models.TAppSettings
 import ru.ac1d.tasktracker.common.models.TAppTaskId
 
-class TAppTaskProcessor {
-    suspend fun exec(context: TrackerAppContext) = BusinessChain.exec(context)
+class TAppTaskProcessor(private val settings: TAppSettings = TAppSettings()) {
+    suspend fun exec(context: TrackerAppContext) = BusinessChain.exec(context.apply { settings = this@TAppTaskProcessor.settings})
 
     companion object {
         private val BusinessChain = rootChain<TrackerAppContext> {
             initStatus("Context status init")
+            initRepo("Data source repository initialization")
 
             operation("Create task", TAppCommand.CREATE) {
                 stubs("Обработка стабов") {
@@ -40,6 +40,13 @@ class TAppTaskProcessor {
 
                     finishTaskValidation("Успешное завершение процедуры валидации")
                 }
+
+                repo("DB saving") {
+                    taskPrepareRepoCreate("Подготовка объекта для сохранения")
+                    taskRepoCreate("Создание объекта задачи в БД")
+                }
+
+                prepareResult("Подготовка ответа")
             }
 
             operation("Read task", TAppCommand.READ) {
@@ -58,6 +65,13 @@ class TAppTaskProcessor {
 
                     finishTaskValidation("Успешное завершение процедуры валидации")
                 }
+
+                repo("DB") {
+                    taskRepoRead("Чтение из БД")
+                    taskRepoReadPrepareResponse("Подготовка ответа для Read")
+                }
+
+                prepareResult("Подготовка ответа")
             }
 
             operation("Update task", TAppCommand.UPDATE) {
@@ -84,6 +98,15 @@ class TAppTaskProcessor {
 
                     finishTaskValidation("Успешное завершение процедуры валидации")
                 }
+
+                repo("Db") {
+                    taskRepoRead("Чтение из БД")
+                    repoCheckLock("Проверяем блокировку")
+                    repoPrepareUpdate("Подготовка объекта для обновления")
+                    taskRepoUpdate("Обновление объекта БД")
+                }
+
+                prepareResult("Подготовка ответа")
             }
 
             operation("Delete task", TAppCommand.DELETE) {
@@ -102,6 +125,15 @@ class TAppTaskProcessor {
 
                     finishTaskValidation("Успешное завершение процедуры валидации")
                 }
+
+                repo("Db") {
+                    taskRepoRead("Чтение из БД")
+                    repoCheckLock("Проверяем блокировку")
+                    taskRepoPrepareDelete("Подготовка объекта для удаления")
+                    taskRepoDelete("Удаление объекта из БД")
+                }
+
+                prepareResult("Подготовка ответа")
             }
 
             operation("Search task", TAppCommand.SEARCH) {
@@ -117,6 +149,12 @@ class TAppTaskProcessor {
 
                     finishTaskFilterValidation("Успешное завершение процедуры валидации")
                 }
+
+                repo("Db") {
+                    taskRepoSearch("Поиск по фильтру")
+                }
+
+                prepareResult("Подготовка ответа")
             }
         }.build()
     }
