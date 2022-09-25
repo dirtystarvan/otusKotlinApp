@@ -88,8 +88,8 @@ private fun TaskTimings?.fromTransport() : TAppTaskTimings {
         return TAppTaskTimings()
 
     return TAppTaskTimings(
-        start = this.start?.let { TAppTaskDateImpl(it) } ?: TAppTaskDate.NONE,
-        end = this.end?.let { TAppTaskDateImpl(it) } ?: TAppTaskDate.NONE,
+        start = this.start?.let { TAppTaskDate(it) } ?: TAppTaskDate.NONE,
+        end = this.end?.let { TAppTaskDate(it) } ?: TAppTaskDate.NONE,
         estimation = this.estimation ?: 0.0f
     )
 }

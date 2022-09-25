@@ -1,10 +1,9 @@
 package ru.ac1d.tasktracker.common.repo.tables
 
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.javatime.datetime
 
 object Timings: IntIdTable("timings") {
-    val start = datetime("start")
-    val end = datetime("end")
+    val start = varchar("start", 128)
+    val end = varchar("end", 128)
     val estimation = float("estimation")
 }

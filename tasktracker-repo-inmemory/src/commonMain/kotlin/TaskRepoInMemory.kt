@@ -106,13 +106,18 @@ class TaskRepoInMemory(
     override suspend fun searchTask(request: DbTaskFilterRequest): DbTaskListResponse {
         val result = cache.asMap().asSequence()
             .filter { entry ->
-                request.reporterId.takeIf { it != TAppUserId.NONE }?.let {
+                request.ownerId.takeIf { it != TAppUserId.NONE }?.let {
                     it.asString() == entry.value.ownerId
                 } ?: true
             }
             .filter { entry ->
+                request.reporterId.takeIf { it != TAppUserId.NONE }?.let {
+                    it.asString() == entry.value.reporterId
+                } ?: true
+            }
+            .filter { entry ->
                 request.executorId.takeIf { it != TAppUserId.NONE }?.let {
-                    it.asString() == entry.value.ownerId
+                    it.asString() == entry.value.executorId
                 } ?: true
             }
             .filter { entry ->

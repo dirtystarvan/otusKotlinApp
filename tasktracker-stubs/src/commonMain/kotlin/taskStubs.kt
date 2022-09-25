@@ -9,7 +9,7 @@ object TaskStub {
         reporterId = TAppUserId("6969"),
         executorId = TAppUserId("9696"),
         status = TAppTaskStatus.OPEN,
-        timings = TAppTaskTimings(TAppTaskDateImpl("2022-06-13"), TAppTaskDateImpl("2022-06-27")),
+        timings = TAppTaskTimings(TAppTaskDate("2022-06-13"), TAppTaskDate("2022-06-27")),
         ownerId = TAppUserId("1"),
         permissionsClient = mutableSetOf(TAppTaskPermissionsClient.READ),
     )
@@ -22,7 +22,7 @@ object TaskStub {
         reporterId = TAppUserId("6969"),
         executorId = TAppUserId("9696"),
         status = TAppTaskStatus.OPEN,
-        timings = TAppTaskTimings(TAppTaskDateImpl("2022-06-13"), TAppTaskDateImpl("2022-06-27")),
+        timings = TAppTaskTimings(TAppTaskDate("2022-06-13"), TAppTaskDate("2022-06-27")),
         ownerId = TAppUserId("1"),
         permissionsClient = mutableSetOf(TAppTaskPermissionsClient.READ),
     )
