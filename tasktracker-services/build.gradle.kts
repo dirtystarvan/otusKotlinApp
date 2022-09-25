@@ -13,9 +13,9 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
 
-                // transport models
                 implementation(project(":tasktracker-common"))
                 implementation(project(":tasktracker-stubs"))
+                implementation(project(":tasktracker-biz"))
             }
         }
 
